@@ -10,8 +10,12 @@ services:
         value: production
       - key: TIME_LIMIT_MINUTES
         value: 20
+      - key: ADMIN_KEY
+        value: admin123
+      - key: MONGO_URI
+        value: mongodb+srv://your-connection-string
       - key: CORS_ORIGIN
-        value: https://your-app-name.vercel.app
+        value: https://resume-builder-7n8m.onrender.com
     healthCheckPath: /health
     autoDeploy: true
     
