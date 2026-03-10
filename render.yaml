@@ -3,6 +3,7 @@ services:
     name: crccf-resume-builder-backend
     env: node
     plan: free
+    repo: https://github.com/osommgod/crccf-resume-builder.git
     rootDir: backend
     buildCommand: "npm install"
     startCommand: "npm start"
@@ -19,7 +20,3 @@ services:
         value: https://resume-builder-os-omms-projects.vercel.app,https://resume-builder-xi-gilt.vercel.app
     healthCheckPath: /health
     autoDeploy: true
-    
-databases:
-  - name: crccf-resume-db
-    plan: free
