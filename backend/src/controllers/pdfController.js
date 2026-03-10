@@ -1,5 +1,5 @@
 const { PDFDocument } = require('pdf-lib');
-const encryptPDF = require('../utils/encryptPDF');
+const { encryptPDF, validatePDFFormat } = require('../utils/encryptPDF');
 
 /**
  * Generate password-protected PDF from base64 image
@@ -8,11 +8,30 @@ const generateProtectedPDF = async (req, res) => {
   try {
     const { pdfBase64, password } = req.body;
 
+    // Debug logging
+    console.log('PDF Generation Request:', {
+      hasPdfBase64: !!pdfBase64,
+      pdfBase64Length: pdfBase64 ? pdfBase64.length : 0,
+      hasPassword: !!password,
+      passwordLength: password ? password.length : 0,
+      pdfBase64Preview: pdfBase64 ? pdfBase64.substring(0, 100) : 'N/A'
+    });
+
     // Validate input
     if (!pdfBase64 || !password) {
+      console.error('Missing fields:', { pdfBase64: !!pdfBase64, password: !!password });
       return res.status(400).json({
         success: false,
         error: 'Missing required fields: pdfBase64 and password'
+      });
+    }
+
+    // Validate pdfBase64 is not empty
+    if (typeof pdfBase64 !== 'string' || pdfBase64.length < 100) {
+      console.error('Invalid pdfBase64 length:', pdfBase64.length);
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid PDF data - too short or not a string'
       });
     }
 
@@ -24,8 +43,20 @@ const generateProtectedPDF = async (req, res) => {
       });
     }
 
+    // Validate PDF format before encrypting
+    const validation = validatePDFFormat(pdfBase64);
+    if (!validation.valid) {
+      console.error('PDF validation failed:', validation.error);
+      return res.status(400).json({
+        success: false,
+        error: `PDF validation failed: ${validation.error}`
+      });
+    }
+
     // Encrypt the PDF
+    console.log('Starting PDF encryption...');
     const encryptedBase64 = await encryptPDF(pdfBase64, password);
+    console.log('PDF encryption successful');
 
     res.json({
       success: true,

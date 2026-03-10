@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import AdminPage from './pages/AdminPage'
 import { TimeProvider } from './context/TimeContext'
 import { ResumeProvider } from './context/ResumeContext'
+import './styles/modal.css'
 
 /**
  * Main App component for CRCCF Resume Builder

@@ -1,0 +1,144 @@
+/**
+ * Print styles for resume
+ * Only shows resume content when printing
+ */
+
+@media print {
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only resume preview elements */
+  #resume-preview,
+  #resume-preview *,
+  .resume-preview,
+  .resume-preview *,
+  [data-resume-preview],
+  [data-resume-preview] * {
+    visibility: visible;
+  }
+
+  /* Position resume at top left */
+  #resume-preview,
+  .resume-preview,
+  [data-resume-preview] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Ensure proper page sizing */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Hide specific UI elements */
+  .no-print,
+  .btn,
+  button,
+  .form-actions,
+  .admin-header,
+  .sidebar,
+  nav,
+  .navbar,
+  header,
+  footer,
+  .toast,
+  .modal,
+  .modal-overlay,
+  .loading-spinner {
+    display: none !important;
+  }
+
+  /* Ensure background colors print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Resume container styles */
+  .resume-container {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Page break handling */
+  .page-break {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .no-page-break {
+    page-break-inside: avoid;
+  }
+
+  /* Typography for print */
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: #000;
+    background: #fff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
+}
+
+/* Body class for print mode (added by JavaScript) */
+body.printing-resume {
+  /* Add any specific styles for print preparation mode */
+  overflow: hidden;
+}
+
+body.printing-resume .no-print,
+body.printing-resume .btn,
+body.printing-resume button,
+body.printing-resume .form-actions,
+body.printing-resume .admin-header,
+body.printing-resume .sidebar,
+body.printing-resume nav,
+body.printing-resume .navbar,
+body.printing-resume header,
+body.printing-resume footer,
+body.printing-resume .toast,
+body.printing-resume .modal,
+body.printing-resume .modal-overlay {
+  display: none !important;
+}
+
+body.printing-resume #resume-preview,
+body.printing-resume .resume-preview,
+body.printing-resume [data-resume-preview] {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: white;
+  margin: 0;
+  padding: 20px;
+  overflow: visible;
+}

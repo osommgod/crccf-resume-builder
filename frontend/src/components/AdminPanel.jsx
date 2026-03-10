@@ -3,6 +3,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import ResumeViewModal from './ResumeViewModal'
 import ResumeEditModal from './ResumeEditModal'
+import timeService from '../services/timeService'
 
 /**
  * AdminPanel component - Admin dashboard for managing resumes
@@ -19,6 +20,7 @@ const AdminPanel = () => {
   const [showViewModal, setShowViewModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [resettingTimer, setResettingTimer] = useState(false)
 
   // API base URL
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -107,6 +109,34 @@ const AdminPanel = () => {
     fetchResumes(currentPage, searchTerm)
   }
 
+  /**
+   * Handle reset timer (admin only)
+   */
+  const handleResetTimer = async () => {
+    try {
+      setResettingTimer(true)
+      const adminKey = prompt('Enter admin key to reset timer:')
+      
+      if (!adminKey) {
+        setResettingTimer(false)
+        return
+      }
+
+      const response = await timeService.resetTimeStatus(adminKey)
+      
+      if (response.success) {
+        toast.success('Timer reset successfully! Resume submissions are now enabled.')
+      } else {
+        toast.error(response.message || 'Failed to reset timer')
+      }
+    } catch (error) {
+      console.error('Error resetting timer:', error)
+      toast.error(error.response?.data?.message || 'Failed to reset timer. Check admin key.')
+    } finally {
+      setResettingTimer(false)
+    }
+  }
+
   // Load resumes on component mount
   useEffect(() => {
     fetchResumes()
@@ -158,6 +188,41 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+
+      {/* Timer Reset Section */}
+      <div className="card border-l-4 border-red-500">
+        <div className="card-body">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                <i className="fas fa-clock mr-2 text-red-500"></i>
+                Resume Upload Timer
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Reset the timer to enable resume submissions for another 20 minutes.
+              </p>
+            </div>
+            
+            <button
+              onClick={handleResetTimer}
+              disabled={resettingTimer}
+              className="btn btn-danger"
+            >
+              {resettingTimer ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  Resetting...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-redo mr-2"></i>
+                  Reset Timer
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Search and Actions */}
       <div className="card">

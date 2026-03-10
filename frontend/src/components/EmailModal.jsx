@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import axios from 'axios'
-import { generatePDF } from '../utils/generatePDF'
-import { generatePassword } from '../utils/passwordUtils'
+import { generatePassword } from '../utils/simplePDF'
 
 /**
  * EmailModal component - Send resume via email with password-protected PDF
@@ -48,8 +47,21 @@ const EmailModal = ({ onClose, resumeData }) => {
         resumeData.personalInfo.dateOfBirth
       )
 
-      // Generate PDF
-      const pdfBase64 = await generatePDF(resumeData, password, false) // Don't download, just get base64
+      // For email, we'll need to generate PDF separately or use a different approach
+      // For now, let's use the simple PDF generation
+      const { generateSimplePDF } = await import('../utils/simplePDF')
+      const pdfResult = await generateSimplePDF(resumeData)
+      
+      // Convert blob to base64 for email
+      const pdfBase64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          const base64String = reader.result.split(',')[1]
+          resolve(base64String)
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(pdfResult.blob || new Blob())
+      })
 
       // Send email via backend
       const response = await axios.post(`${API_URL}/api/email/send-email`, {

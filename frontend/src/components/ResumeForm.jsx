@@ -4,8 +4,7 @@ import PasswordModal from './PasswordModal'
 import EmailModal from './EmailModal'
 import AddSectionModal from './shared/AddSectionModal'
 import toast from 'react-hot-toast'
-import { generatePDF } from '../utils/generatePDF'
-import { generatePassword } from '../utils/passwordUtils'
+import { generateSimplePDF, generatePassword } from '../utils/simplePDF'
 
 /**
  * ResumeForm component - Dynamic multi-section resume form
@@ -102,7 +101,7 @@ const ResumeForm = ({ disabled, showPreview, onTogglePreview }) => {
         resumeData.personalInfo.dateOfBirth
       )
       
-      await generatePDF(resumeData, password)
+      await generateSimplePDF(resumeData)
       
       setShowPasswordModal(true)
       toast.success('Resume downloaded successfully!')

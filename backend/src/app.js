@@ -10,6 +10,7 @@ const resumeRoutes = require('./routes/resumes');
 const pdfRoutes = require('./routes/pdf');
 const emailRoutes = require('./routes/email');
 const timeStatusRoutes = require('./routes/timeStatus');
+const simplePDFRoutes = require('./routes/simplePDF');
 
 // Import middleware
 const errorHandler = require('./middlewares/errorHandler');
@@ -57,6 +58,7 @@ app.use('/api/resumes', resumeRoutes);
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api', timeStatusRoutes);
+app.use('/api/simple-pdf', simplePDFRoutes);
 
 // 404 handler
 app.use(notFound);

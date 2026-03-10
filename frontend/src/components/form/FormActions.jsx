@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { useResume } from '../../context/ResumeContext'
-import { generateProtectedPDF } from '../../utils/generatePDF'
-import { generatePassword } from '../../utils/generatePassword'
+import { generateSimplePDF, generatePassword } from '../../utils/simplePDF'
 import PasswordModal from '../shared/PasswordModal'
 import EmailModal from '../shared/EmailModal'
+import WhatsAppModal from '../shared/WhatsAppModal'
 import toast from 'react-hot-toast'
+import '../../styles/print.css'
 
 /**
  * PDF Download, Email, Print buttons + validation
@@ -20,10 +21,11 @@ const FormActions = ({
   const { resumeData, validateResume, resetResume } = useResume()
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
   const [generatedPDF, setGeneratedPDF] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
 
-  // Handle PDF generation
+  // Handle PDF generation - Client-side encryption
   const handleGeneratePDF = async () => {
     // Validate form first
     const validation = onValidate ? onValidate() : validateResume()
@@ -35,9 +37,12 @@ const FormActions = ({
     setIsGenerating(true)
     
     try {
-      const result = await generateProtectedPDF(resumeData, 'resume-preview')
+      // Use simple PDF generation (like working project)
+      console.log('🟢 FormActions: Calling simple PDF generation')
+      const result = await generateSimplePDF(resumeData)
       setGeneratedPDF(result)
       setShowPasswordModal(true)
+      toast.success('PDF generated and downloaded successfully!')
     } catch (error) {
       console.error('Error generating PDF:', error)
       toast.error('Failed to generate PDF. Please try again.')
@@ -46,7 +51,7 @@ const FormActions = ({
     }
   }
 
-  // Handle email sending
+  // Handle email sending - Client-side PDF generation
   const handleSendEmail = async () => {
     // Validate form first
     const validation = onValidate ? onValidate() : validateResume()
@@ -59,9 +64,11 @@ const FormActions = ({
     if (!generatedPDF) {
       setIsGenerating(true)
       try {
-        const result = await generateProtectedPDF(resumeData, 'resume-preview')
+        // Use client-side PDF generation with encryption
+        const result = await generateProtectedPDFClient(resumeData, 'resume-preview', false)
         setGeneratedPDF(result)
         setShowEmailModal(true)
+        toast.success('PDF generated successfully!')
       } catch (error) {
         console.error('Error generating PDF:', error)
         toast.error('Failed to generate PDF. Please try again.')
@@ -73,7 +80,7 @@ const FormActions = ({
     }
   }
 
-  // Handle print
+  // Handle print - improved version with print-only CSS
   const handlePrint = () => {
     // Validate form first
     const validation = onValidate ? onValidate() : validateResume()
@@ -82,50 +89,45 @@ const FormActions = ({
       return
     }
 
-    // Print the resume preview
-    const printWindow = window.open('', '_blank')
-    if (!printWindow) {
-      toast.error('Please allow popups for this website to use print feature')
+    // Add print-only class to body for CSS targeting
+    document.body.classList.add('printing-resume')
+    
+    // Trigger print
+    window.print()
+    
+    // Remove class after print dialog closes
+    setTimeout(() => {
+      document.body.classList.remove('printing-resume')
+    }, 1000)
+
+    toast.success('Print dialog opened - only resume will be printed')
+  }
+
+  // Handle WhatsApp sharing
+  const handleWhatsAppShare = async () => {
+    // Validate form first
+    const validation = onValidate ? onValidate() : validateResume()
+    if (!validation.isValid) {
+      toast.error('Please complete all required fields before sharing')
       return
     }
 
-    const resumeElement = document.getElementById('resume-preview')
-    if (!resumeElement) {
-      toast.error('Resume preview not found')
-      return
+    // Generate PDF if not already generated
+    if (!generatedPDF) {
+      setIsGenerating(true)
+      try {
+        const result = await generateProtectedPDF(resumeData, 'resume-preview')
+        setGeneratedPDF(result)
+        setShowWhatsAppModal(true)
+      } catch (error) {
+        console.error('Error generating PDF:', error)
+        toast.error('Failed to generate PDF. Please try again.')
+      } finally {
+        setIsGenerating(false)
+      }
+    } else {
+      setShowWhatsAppModal(true)
     }
-
-    const resumeHTML = resumeElement.outerHTML
-    
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Resume - ${resumeData.personalInfo.fullName}</title>
-        <style>
-          body { margin: 0; padding: 20px; font-family: 'Roboto', sans-serif; }
-          .no-print { display: none !important; }
-          @media print {
-            body { margin: 0; padding: 0; }
-            .page-break { page-break-before: always; }
-          }
-        </style>
-      </head>
-      <body>
-        ${resumeHTML}
-      </body>
-      </html>
-    `)
-    
-    printWindow.document.close()
-    printWindow.onload = () => {
-      setTimeout(() => {
-        printWindow.print()
-        printWindow.close()
-      }, 500)
-    }
-
-    toast.success('Print dialog opened')
   }
 
   // Handle reset form
@@ -145,6 +147,11 @@ const FormActions = ({
   // Handle email modal close
   const handleEmailModalClose = () => {
     setShowEmailModal(false)
+  }
+
+  // Handle WhatsApp modal close
+  const handleWhatsAppModalClose = () => {
+    setShowWhatsAppModal(false)
   }
 
   // Get password for display
@@ -206,6 +213,17 @@ const FormActions = ({
             >
               <i className="fas fa-envelope mr-2"></i>
               Email
+            </button>
+
+            <button
+              type="button"
+              onClick={handleWhatsAppShare}
+              disabled={disabled || !isFormValid || isGenerating}
+              className="btn btn-whatsapp"
+              title="Share via WhatsApp"
+            >
+              <i className="fab fa-whatsapp mr-2"></i>
+              WhatsApp
             </button>
 
             <button
@@ -281,6 +299,15 @@ const FormActions = ({
           handleEmailModalClose()
           toast.success(`Resume sent to ${email}!`)
         }}
+      />
+
+      {/* WhatsApp Modal */}
+      <WhatsAppModal
+        isOpen={showWhatsAppModal}
+        onClose={handleWhatsAppModalClose}
+        resumeData={resumeData}
+        password={getPassword()}
+        resumeBase64={generatedPDF?.pdfBase64}
       />
     </>
   )

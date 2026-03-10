@@ -1,0 +1,25 @@
+/* Modal z-index utilities */
+.modal-overlay {
+  z-index: 99999 !important;
+}
+
+.modal-backdrop {
+  z-index: 99998 !important;
+}
+
+/* Ensure modals are above all content */
+.modal-container {
+  z-index: 99999 !important;
+}
+
+/* Resume preview z-index (lower than modals) */
+.resume-preview {
+  z-index: 1000 !important;
+}
+
+/* Print mode overrides */
+body.printing-resume .modal-overlay,
+body.printing-resume .modal-backdrop,
+body.printing-resume .modal-container {
+  display: none !important;
+}

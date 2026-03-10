@@ -9,6 +9,7 @@ const resumeRoutes = require('./src/routes/resumes');
 const pdfRoutes = require('./src/routes/pdf');
 const emailRoutes = require('./src/routes/email');
 const timeStatusRoutes = require('./src/routes/timeStatus');
+const simplePDFRoutes = require('./src/routes/simplePDF');
 
 // Load environment variables
 dotenv.config();
@@ -23,14 +24,16 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Get allowed origins from environment
+    // Always allow localhost for development
     const allowedOrigins = process.env.CORS_ORIGIN ? 
-      process.env.CORS_ORIGIN.split(',') : 
-      ['http://localhost:3000'];
+      [...process.env.CORS_ORIGIN.split(','), 'http://localhost:3000', 'http://localhost:5173'] : 
+      ['http://localhost:3000', 'http://localhost:5173'];
     
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
+      console.log('CORS rejected origin:', origin);
+      console.log('Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -92,6 +95,7 @@ app.use('/api/resumes', resumeRoutes);
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api', timeStatusRoutes);
+app.use('/api/simple-pdf', simplePDFRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
