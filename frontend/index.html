@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="CRCCF Resume Builder - Create professional resumes with dynamic forms and instant PDF generation" />
+    <meta name="keywords" content="resume builder, CV maker, professional resume, PDF resume, CRCCF" />
+    <meta name="author" content="CRCCF Resume Builder" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="CRCCF Resume Builder - Professional Resume Creator" />
+    <meta property="og:description" content="Create stunning professional resumes with our dynamic form builder. Download password-protected PDFs instantly." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CRCCF Resume Builder" />
+    <meta name="twitter:description" content="Create professional resumes with dynamic forms and instant PDF generation" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <title>CRCCF Resume Builder - Create Professional Resumes</title>
+    
+    <!-- Inline critical CSS for faster loading -->
+    <style>
+      /* Prevent flash of unstyled content */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #f8fafc;
+        color: #1e293b;
+        line-height: 1.6;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Loading spinner */
+      .initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+      
+      .initial-loader-content {
+        text-align: center;
+        color: white;
+      }
+      
+      .initial-loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .initial-loader h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      
+      .initial-loader p {
+        margin: 10px 0 0;
+        opacity: 0.9;
+        font-size: 16px;
+      }
+      
+      /* Hide loader when React app loads */
+      .react-loaded .initial-loader {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Initial loading screen -->
+    <div class="initial-loader" id="initial-loader">
+      <div class="initial-loader-content">
+        <div class="initial-loader-spinner"></div>
+        <h2>CRCCF Resume Builder</h2>
+        <p>Loading your professional resume creator...</p>
+      </div>
+    </div>
+    
+    <!-- React app root -->
+    <div id="root"></div>
+    
+    <!-- Vite entry point -->
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Remove loader when React app loads -->
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          document.body.classList.add('react-loaded');
+        }, 100);
+      });
+    </script>
+  </body>
+</html>

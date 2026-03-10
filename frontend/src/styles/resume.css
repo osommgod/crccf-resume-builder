@@ -1,0 +1,477 @@
+/**
+ * Resume-specific styles
+ * A4 page-break, print media query, preview styles
+ */
+
+/* A4 page dimensions */
+:root {
+  --a4-width: 210mm;
+  --a4-height: 297mm;
+  --a4-width-px: 794px;
+  --a4-height-px: 1123px;
+  --a4-margin: 20mm;
+  --a4-margin-px: 75px;
+}
+
+/* Resume preview container */
+.resume-preview {
+  width: var(--a4-width);
+  min-height: var(--a4-height);
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
+  padding: var(--a4-margin);
+  font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #1f2937;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Resume header section */
+.resume-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.resume-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 20px;
+  border: 3px solid #3b82f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.resume-contact-info {
+  flex: 1;
+}
+
+.resume-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 5px 0;
+  line-height: 1.2;
+}
+
+.resume-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.resume-contact-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 11px;
+  color: #4b5563;
+}
+
+.resume-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.resume-contact-item i {
+  color: #3b82f6;
+  width: 12px;
+  text-align: center;
+}
+
+/* Resume sections */
+.resume-section {
+  margin-bottom: 20px;
+}
+
+.resume-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e5e7eb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.resume-objective {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #374151;
+  text-align: justify;
+  margin: 0;
+}
+
+/* Resume entries (education, experience, etc.) */
+.resume-entry {
+  margin-bottom: 12px;
+  padding-left: 15px;
+  position: relative;
+}
+
+.resume-entry::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 4px;
+  height: 4px;
+  background: #3b82f6;
+  border-radius: 50%;
+}
+
+.resume-entry:last-child {
+  margin-bottom: 0;
+}
+
+.resume-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3px;
+}
+
+.resume-entry-title {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 12px;
+}
+
+.resume-entry-period {
+  font-size: 10px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.resume-entry-subtitle {
+  font-size: 11px;
+  color: #3b82f6;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.resume-entry-description {
+  font-size: 10px;
+  line-height: 1.4;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* Skills section */
+.resume-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.resume-skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.resume-skill-name {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.resume-skill-level {
+  color: #6b7280;
+  font-size: 10px;
+}
+
+/* Projects section */
+.resume-project {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.resume-project:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.resume-project-title {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.resume-project-tech {
+  font-size: 10px;
+  color: #3b82f6;
+  font-style: italic;
+  margin-bottom: 3px;
+}
+
+.resume-project-description {
+  font-size: 10px;
+  line-height: 1.4;
+  color: #4b5563;
+  margin: 0 0 3px 0;
+}
+
+.resume-project-links {
+  font-size: 9px;
+}
+
+.resume-project-link {
+  color: #3b82f6;
+  text-decoration: none;
+  margin-right: 10px;
+}
+
+.resume-project-link:hover {
+  text-decoration: underline;
+}
+
+/* Languages section */
+.resume-languages-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.resume-language-item {
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.resume-language-name {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.resume-language-level {
+  color: #6b7280;
+}
+
+/* Hobbies section */
+.resume-hobbies {
+  font-size: 11px;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+/* References section */
+.resume-reference {
+  margin-bottom: 10px;
+  font-size: 10px;
+}
+
+.resume-reference:last-child {
+  margin-bottom: 0;
+}
+
+.resume-reference-name {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.resume-reference-title {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.resume-reference-company {
+  color: #6b7280;
+}
+
+.resume-reference-email {
+  color: #3b82f6;
+  font-size: 9px;
+}
+
+/* Print styles */
+@media print {
+  .resume-preview {
+    width: var(--a4-width);
+    min-height: var(--a4-height);
+    box-shadow: none;
+    margin: 0;
+    padding: var(--a4-margin);
+    page-break-after: always;
+  }
+  
+  .resume-preview:last-child {
+    page-break-after: auto;
+  }
+  
+  .resume-section {
+    page-break-inside: avoid;
+    margin-bottom: 15px;
+  }
+  
+  .resume-entry {
+    page-break-inside: avoid;
+    margin-bottom: 8px;
+  }
+  
+  .resume-project {
+    page-break-inside: avoid;
+    margin-bottom: 10px;
+  }
+  
+  .resume-header {
+    page-break-inside: avoid;
+    margin-bottom: 15px;
+  }
+  
+  .resume-objective {
+    page-break-inside: avoid;
+  }
+  
+  /* Ensure colors don't break in grayscale printing */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  /* Hide any interactive elements */
+  button,
+  .no-print,
+  .screen-only {
+    display: none !important;
+  }
+  
+  /* Optimize font sizes for print */
+  .resume-preview {
+    font-size: 11px;
+  }
+  
+  .resume-name {
+    font-size: 22px;
+  }
+  
+  .resume-section-title {
+    font-size: 15px;
+  }
+  
+  /* Remove backgrounds for better print quality */
+  .resume-preview,
+  .resume-section,
+  .resume-entry,
+  .resume-project {
+    background: transparent !important;
+  }
+}
+
+/* Responsive preview for smaller screens */
+@media (max-width: 900px) {
+  .resume-preview {
+    transform: scale(0.8);
+    transform-origin: top center;
+    margin-bottom: -20%;
+  }
+}
+
+@media (max-width: 700px) {
+  .resume-preview {
+    transform: scale(0.6);
+    margin-bottom: -40%;
+  }
+}
+
+/* High quality rendering for PDF generation */
+.pdf-quality .resume-preview {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Two-column layout for certain sections */
+.resume-two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Section spacing optimizations */
+.resume-section + .resume-section {
+  margin-top: 20px;
+}
+
+/* Entry spacing optimizations */
+.resume-entry + .resume-entry {
+  margin-top: 8px;
+}
+
+/* Custom scrollbar for long content */
+.resume-preview::-webkit-scrollbar {
+  width: 6px;
+}
+
+.resume-preview::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.resume-preview::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.resume-preview::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation for preview updates */
+.resume-preview.updating {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.resume-preview.updated {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+/* Accessibility improvements */
+.resume-preview:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Print preview mode */
+.print-preview .resume-preview {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+/* Dark mode support for preview (optional) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode .resume-preview {
+    background: #1f2937;
+    color: #f9fafb;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark-mode .resume-name {
+    color: #f9fafb;
+  }
+  
+  .dark-mode .resume-section-title {
+    color: #f9fafb;
+    border-bottom-color: #374151;
+  }
+  
+  .dark-mode .resume-entry-title {
+    color: #f9fafb;
+  }
+}
