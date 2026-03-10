@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useResume } from '../context/ResumeContext'
 import PasswordModal from './PasswordModal'
 import EmailModal from './EmailModal'
+import AddSectionModal from './shared/AddSectionModal'
 import toast from 'react-hot-toast'
 import { generatePDF } from '../utils/generatePDF'
 import { generatePassword } from '../utils/passwordUtils'
@@ -25,6 +26,8 @@ const ResumeForm = ({ disabled, showPreview, onTogglePreview }) => {
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [modalSection, setModalSection] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [activeSection, setActiveSection] = useState('personal')
 
@@ -65,68 +68,21 @@ const ResumeForm = ({ disabled, showPreview, onTogglePreview }) => {
    * Add new entry to dynamic section
    */
   const handleAddEntry = (section) => {
-    let newEntry
-    
-    switch (section) {
-      case 'education':
-        newEntry = {
-          degree: '',
-          institution: '',
-          yearFrom: '',
-          yearTo: '',
-          percentage: ''
-        }
-        break
-      case 'experience':
-        newEntry = {
-          jobTitle: '',
-          company: '',
-          location: '',
-          duration: '',
-          description: ''
-        }
-        break
-      case 'skills':
-        newEntry = {
-          name: '',
-          proficiency: 'Beginner'
-        }
-        break
-      case 'projects':
-        newEntry = {
-          name: '',
-          techStack: '',
-          description: '',
-          liveUrl: '',
-          githubUrl: ''
-        }
-        break
-      case 'certifications':
-        newEntry = {
-          name: '',
-          issuer: '',
-          year: ''
-        }
-        break
-      case 'languages':
-        newEntry = {
-          language: '',
-          proficiency: ''
-        }
-        break
-      case 'references':
-        newEntry = {
-          name: '',
-          designation: '',
-          company: '',
-          email: ''
-        }
-        break
-      default:
-        return
+    // For references, keep the old behavior (inline form)
+    if (section === 'references') {
+      const newEntry = {
+        name: '',
+        designation: '',
+        company: '',
+        email: ''
+      }
+      addEntry(section, newEntry)
+      return
     }
     
-    addEntry(section, newEntry)
+    // For other sections, open the modal
+    setModalSection(section)
+    setShowAddModal(true)
   }
 
   /**
@@ -1094,6 +1050,14 @@ const ResumeForm = ({ disabled, showPreview, onTogglePreview }) => {
         <EmailModal
           onClose={() => setShowEmailModal(false)}
           resumeData={resumeData}
+        />
+      )}
+      
+      {showAddModal && (
+        <AddSectionModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          sectionType={modalSection}
         />
       )}
     </div>

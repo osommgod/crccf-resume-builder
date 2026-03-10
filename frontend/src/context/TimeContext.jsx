@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer } from 'react'
+import React, { createContext, useContext, useReducer, useEffect } from 'react'
+import { timeService } from '../services/timeService'
 
 /**
  * Time context for managing time-related state
@@ -102,8 +103,63 @@ export const TimeProvider = ({ children }) => {
     
     updateRemaining: () => {
       dispatch({ type: TIME_ACTIONS.UPDATE_REMAINING })
+    },
+
+    // Fetch time status from backend
+    fetchTimeStatus: async () => {
+      try {
+        dispatch({ type: TIME_ACTIONS.SET_LOADING, payload: true })
+        const response = await timeService.getTimeStatus()
+        
+        if (response.success) {
+          dispatch({
+            type: TIME_ACTIONS.SET_TIME_STATUS,
+            payload: {
+              isAllowed: response.data.isAllowed,
+              remainingSeconds: response.data.remainingSeconds
+            }
+          })
+        } else {
+          dispatch({ type: TIME_ACTIONS.SET_ERROR, payload: response.error })
+        }
+      } catch (error) {
+        console.error('Failed to fetch time status:', error)
+        dispatch({ 
+          type: TIME_ACTIONS.SET_ERROR, 
+          payload: 'Failed to fetch time status from server' 
+        })
+      }
+    },
+
+    // Reset time status (admin only)
+    resetTimeStatus: async (adminKey) => {
+      try {
+        const response = await timeService.resetTimeStatus(adminKey)
+        if (response.success) {
+          // Fetch updated time status after reset
+          await actions.fetchTimeStatus()
+          return response
+        } else {
+          throw new Error(response.error)
+        }
+      } catch (error) {
+        console.error('Failed to reset time status:', error)
+        throw error
+      }
     }
   }
+
+  // Fetch time status on component mount
+  useEffect(() => {
+    actions.fetchTimeStatus()
+    
+    // Set up periodic refresh to sync with server time
+    const interval = setInterval(() => {
+      actions.fetchTimeStatus()
+    }, 30000) // Refresh every 30 seconds
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Countdown timer effect
   React.useEffect(() => {

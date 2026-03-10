@@ -6,13 +6,30 @@ import { useTime } from '../context/TimeContext'
  * Shows different colors based on time remaining
  */
 const CountdownTimer = () => {
-  const { isLoading, isAllowed, remainingSeconds } = useTime()
+  const { isLoading, isAllowed, remainingSeconds, error, fetchTimeStatus } = useTime()
 
-  // Don't show timer if loading
+  // Handle error state
+  if (error) {
+    return (
+      <div className="flex items-center space-x-2">
+        <i className="fas fa-exclamation-triangle text-red-600"></i>
+        <span className="text-sm text-red-600">Timer Error</span>
+        <button
+          onClick={fetchTimeStatus}
+          className="text-xs text-blue-600 hover:text-blue-800 underline"
+          title="Retry"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
+
+  // Show loading state
   if (isLoading) {
     return (
       <div className="flex items-center space-x-2">
-        <div className="spinner w-4 h-4"></div>
+        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
         <span className="text-sm text-gray-600">Loading...</span>
       </div>
     )
@@ -46,7 +63,7 @@ const CountdownTimer = () => {
 
   const timeColor = getTimeColor()
   const formattedTime = formatTime(remainingSeconds)
-  const totalSeconds = 3600 // Default 1 hour
+  const totalSeconds = 20 * 60 // 20 minutes from backend config
 
   return (
     <div className="flex items-center space-x-3">

@@ -290,6 +290,13 @@ export const ResumeProvider = ({ children }) => {
     })
   }
 
+  const updateObjective = (objective) => {
+    dispatch({
+      type: RESUME_ACTIONS.SET_OBJECTIVE,
+      payload: objective
+    })
+  }
+
   const addEducation = (education) => {
     dispatch({
       type: RESUME_ACTIONS.ADD_EDUCATION,
@@ -423,11 +430,171 @@ export const ResumeProvider = ({ children }) => {
     })
   }
 
+  const updateHobbies = (hobbies) => {
+    dispatch({
+      type: RESUME_ACTIONS.SET_HOBBIES,
+      payload: hobbies
+    })
+  }
+
   const addReference = (reference) => {
     dispatch({
       type: RESUME_ACTIONS.ADD_REFERENCE,
       payload: reference
     })
+  }
+
+  // Generic addEntry function for dynamic sections
+  const addEntry = (sectionType, data) => {
+    switch (sectionType) {
+      case 'education':
+        dispatch({
+          type: RESUME_ACTIONS.ADD_EDUCATION,
+          payload: data
+        })
+        break
+      case 'experience':
+      case 'workExperience':
+        dispatch({
+          type: RESUME_ACTIONS.ADD_EXPERIENCE,
+          payload: data
+        })
+        break
+      case 'skills':
+        dispatch({
+          type: RESUME_ACTIONS.ADD_SKILL,
+          payload: data
+        })
+        break
+      case 'projects':
+        dispatch({
+          type: RESUME_ACTIONS.ADD_PROJECT,
+          payload: data
+        })
+        break
+      case 'certifications':
+        dispatch({
+          type: RESUME_ACTIONS.ADD_CERTIFICATION,
+          payload: data
+        })
+        break
+      case 'languages':
+        dispatch({
+          type: RESUME_ACTIONS.ADD_LANGUAGE,
+          payload: data
+        })
+        break
+      case 'references':
+        dispatch({
+          type: RESUME_ACTIONS.ADD_REFERENCE,
+          payload: data
+        })
+        break
+      default:
+        console.error(`Unknown section type: ${sectionType}`)
+    }
+  }
+
+  // Generic updateEntry function for dynamic sections
+  const updateEntry = (sectionType, index, data) => {
+    switch (sectionType) {
+      case 'education':
+        dispatch({
+          type: RESUME_ACTIONS.UPDATE_EDUCATION,
+          payload: { index, data }
+        })
+        break
+      case 'experience':
+      case 'workExperience':
+        dispatch({
+          type: RESUME_ACTIONS.UPDATE_EXPERIENCE,
+          payload: { index, data }
+        })
+        break
+      case 'skills':
+        dispatch({
+          type: RESUME_ACTIONS.UPDATE_SKILL,
+          payload: { index, data }
+        })
+        break
+      case 'projects':
+        dispatch({
+          type: RESUME_ACTIONS.UPDATE_PROJECT,
+          payload: { index, data }
+        })
+        break
+      case 'certifications':
+        dispatch({
+          type: RESUME_ACTIONS.UPDATE_CERTIFICATION,
+          payload: { index, data }
+        })
+        break
+      case 'languages':
+        dispatch({
+          type: RESUME_ACTIONS.UPDATE_LANGUAGE,
+          payload: { index, data }
+        })
+        break
+      case 'references':
+        dispatch({
+          type: RESUME_ACTIONS.UPDATE_REFERENCE,
+          payload: { index, data }
+        })
+        break
+      default:
+        console.error(`Unknown section type: ${sectionType}`)
+    }
+  }
+
+  // Generic removeEntry function for dynamic sections
+  const removeEntry = (sectionType, index) => {
+    switch (sectionType) {
+      case 'education':
+        dispatch({
+          type: RESUME_ACTIONS.REMOVE_EDUCATION,
+          payload: index
+        })
+        break
+      case 'experience':
+      case 'workExperience':
+        dispatch({
+          type: RESUME_ACTIONS.REMOVE_EXPERIENCE,
+          payload: index
+        })
+        break
+      case 'skills':
+        dispatch({
+          type: RESUME_ACTIONS.REMOVE_SKILL,
+          payload: index
+        })
+        break
+      case 'projects':
+        dispatch({
+          type: RESUME_ACTIONS.REMOVE_PROJECT,
+          payload: index
+        })
+        break
+      case 'certifications':
+        dispatch({
+          type: RESUME_ACTIONS.REMOVE_CERTIFICATION,
+          payload: index
+        })
+        break
+      case 'languages':
+        dispatch({
+          type: RESUME_ACTIONS.REMOVE_LANGUAGE,
+          payload: index
+        })
+        break
+      case 'references':
+        dispatch({
+          type: RESUME_ACTIONS.REMOVE_REFERENCE,
+          payload: index
+        })
+        break
+      default:
+        console.error(`Unknown section type: ${sectionType}`)
+    }
   }
 
   const updateReference = (index, data) => {
@@ -570,6 +737,7 @@ export const ResumeProvider = ({ children }) => {
     
     // Objective
     setObjective,
+    updateObjective,
     
     // Education actions
     addEducation,
@@ -603,11 +771,17 @@ export const ResumeProvider = ({ children }) => {
     
     // Hobbies
     setHobbies,
+    updateHobbies,
     
     // References actions
     addReference,
     updateReference,
     removeReference,
+    
+    // Generic actions
+    addEntry,
+    updateEntry,
+    removeEntry,
     
     // Utility actions
     resetResume,
