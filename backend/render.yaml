@@ -3,6 +3,7 @@ services:
     name: crccf-resume-builder-backend
     env: node
     plan: free
+    rootDir: backend
     buildCommand: "npm install"
     startCommand: "npm start"
     envVars:
@@ -13,9 +14,9 @@ services:
       - key: ADMIN_KEY
         value: admin123
       - key: MONGO_URI
-        value: mongodb+srv://your-connection-string
+        value: mongodb+srv://Aryaman007:aryaman143@cluster0.cxo50zl.mongodb.net/resume_builder
       - key: CORS_ORIGIN
-        value: https://resume-builder-7n8m.onrender.com
+        value: https://resume-builder-os-omms-projects.vercel.app,https://resume-builder-xi-gilt.vercel.app
     healthCheckPath: /health
     autoDeploy: true
     
