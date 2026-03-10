@@ -18,10 +18,6 @@
     "deploy:frontend": "cd frontend && vercel --prod",
     "deploy:backend": "echo 'Deploy backend via Render dashboard'"
   },
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "keywords": [
     "resume",
     "builder",
