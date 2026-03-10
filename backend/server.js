@@ -115,11 +115,20 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Check if running in Vercel serverless environment
+if (process.env.NODE_ENV === 'production' && process.env.VERCEL) {
+  // Export for Vercel serverless functions
+  module.exports = app;
+} else {
+  // Start server for local development
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`📝 Environment: ${process.env.NODE_ENV}`);
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`� MongoDB URI configured: ${!!process.env.MONGO_URI}`);
+    console.log(`⏰ Time limit: ${process.env.TIME_LIMIT_MINUTES || 20} minutes`);
+  });
+};
 
 // Graceful shutdown
 process.on('SIGTERM', () => {

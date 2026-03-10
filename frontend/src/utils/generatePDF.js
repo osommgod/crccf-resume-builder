@@ -2,6 +2,7 @@ import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import axiosInstance from './axiosInstance'
 import toast from 'react-hot-toast'
+import { generatePDFFallback } from './generatePDFFallback'
 
 /**
  * Generate PDF from resume preview with password protection
@@ -22,34 +23,46 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 export const generatePDF = async (resumeData, password, download = true) => {
   try {
     // Get the resume preview element - try multiple selectors
-    let resumeElement = document.querySelector('.resume-preview')
-    
-    if (!resumeElement) {
-      // Fallback to other possible selectors
-      resumeElement = document.querySelector('[data-resume-preview]') ||
-                     document.querySelector('.resume-container') ||
-                     document.querySelector('#resume-preview')
-    }
+    let resumeElement = document.querySelector('.resume-preview') ||
+                       document.querySelector('#resume-preview') ||
+                       document.querySelector('[data-resume-preview]') ||
+                       document.querySelector('.resume-container')
     
     if (!resumeElement) {
       console.error('Resume preview element not found. Available elements:', 
-        document.querySelectorAll('[class*="resume"]'))
+        Array.from(document.querySelectorAll('[class*="resume"]')).map(el => ({
+          class: el.className,
+          id: el.id,
+          tag: el.tagName
+        })))
       throw new Error('Resume preview element not found. Please ensure the resume preview is visible.')
     }
 
     // Show loading state
     toast.loading('Generating PDF...', { id: 'pdf-generation' })
 
-    // Ensure element is visible
+    // Store original styles and ensure element is visible
     const originalDisplay = resumeElement.style.display
     const originalVisibility = resumeElement.style.visibility
+    const originalOpacity = resumeElement.style.opacity
+    const originalZIndex = resumeElement.style.zIndex
+    
+    // Make element visible for capture
     resumeElement.style.display = 'block'
     resumeElement.style.visibility = 'visible'
+    resumeElement.style.opacity = '1'
+    resumeElement.style.zIndex = '9999'
+    
+    // Scroll element into view
+    resumeElement.scrollIntoView({ behavior: 'instant', block: 'start' })
 
     try {
+      // Wait a bit for any pending renders
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
       // Configure html2canvas options for high quality
       const canvas = await html2canvas(resumeElement, {
-        scale: 2, // Higher scale for better quality
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
@@ -60,80 +73,102 @@ export const generatePDF = async (resumeData, password, download = true) => {
         windowHeight: resumeElement.scrollHeight,
         onclone: (clonedDoc) => {
           // Ensure styles are applied in cloned document
-          const clonedElement = clonedDoc.querySelector('.resume-preview')
+          const clonedElement = clonedDoc.querySelector('.resume-preview') ||
+                               clonedDoc.querySelector('#resume-preview')
           if (clonedElement) {
             clonedElement.style.display = 'block'
             clonedElement.style.visibility = 'visible'
+            clonedElement.style.opacity = '1'
           }
         }
       })
 
-    // Create PDF from canvas
-    const imgData = canvas.toDataURL('image/png')
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    
-    // A4 dimensions in mm
-    const pdfWidth = pdf.internal.pageSize.getWidth()
-    const pdfHeight = pdf.internal.pageSize.getHeight()
-    
-    // Calculate image dimensions to fit A4
-    const imgWidth = canvas.width
-    const imgHeight = canvas.height
-    const ratio = Math.min(pdfWidth / (imgWidth * 0.264583), pdfHeight / (imgHeight * 0.264583))
-    const imgX = (pdfWidth - imgWidth * ratio * 0.264583) / 2
-    const imgY = 0
-    
-    // Add image to PDF
-    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio * 0.264583, imgHeight * ratio * 0.264583)
-    
-    // Get PDF as base64
-    const pdfBase64 = pdf.output('datauristring')
-    
-    // Remove data URL prefix for backend
-    const base64Data = pdfBase64.replace(/^data:application\/pdf;base64,/, '')
-    
-    // Send to backend for password protection
-    const response = await axiosInstance.post('/pdf/generate-pdf', {
-      pdfBase64: base64Data,
-      password: password
-    })
+      if (!canvas) {
+        throw new Error('Failed to generate canvas from resume preview')
+      }
 
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to encrypt PDF')
-    }
+      // Create PDF from canvas
+      const imgData = canvas.toDataURL('image/png', 1.0)
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      
+      // A4 dimensions in mm
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      
+      // Calculate image dimensions to fit A4
+      const imgWidth = canvas.width
+      const imgHeight = canvas.height
+      const ratio = Math.min(pdfWidth / (imgWidth * 0.264583), pdfHeight / (imgHeight * 0.264583))
+      const imgX = (pdfWidth - imgWidth * ratio * 0.264583) / 2
+      const imgY = 0
+      
+      // Add image to PDF
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio * 0.264583, imgHeight * ratio * 0.264583)
+      
+      // Get PDF as base64
+      const pdfBase64 = pdf.output('datauristring')
+      
+      // Remove data URL prefix for backend
+      const base64Data = pdfBase64.replace(/^data:application\/pdf;base64,/, '')
+      
+      // Send to backend for password protection
+      const response = await axiosInstance.post('/api/pdf/generate-pdf', {
+        pdfBase64: base64Data,
+        password: password
+      })
 
-    const encryptedBase64 = response.data.data.pdfBase64
-    
-    // Download if requested
-    if (download) {
-      const link = document.createElement('a')
-      link.href = `data:application/pdf;base64,${encryptedBase64}`
-      link.download = `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to encrypt PDF')
+      }
 
-    // Show success message
-    toast.success('PDF generated successfully!', { id: 'pdf-generation' })
-    
-    // Restore original element styles
-    resumeElement.style.display = originalDisplay
-    resumeElement.style.visibility = originalVisibility
-    
-    return encryptedBase64
-    
+      const encryptedBase64 = response.data.data.pdfBase64
+      
+      // Download if requested
+      if (download) {
+        const link = document.createElement('a')
+        link.href = `data:application/pdf;base64,${encryptedBase64}`
+        link.download = `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.pdf`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+
+      // Show success message
+      toast.success('PDF generated successfully!', { id: 'pdf-generation' })
+      
+      // Restore original element styles
+      resumeElement.style.display = originalDisplay
+      resumeElement.style.visibility = originalVisibility
+      resumeElement.style.opacity = originalOpacity
+      resumeElement.style.zIndex = originalZIndex
+      
+      return encryptedBase64
+      
     } catch (canvasError) {
       // Restore original element styles on canvas error
       resumeElement.style.display = originalDisplay
       resumeElement.style.visibility = originalVisibility
+      resumeElement.style.opacity = originalOpacity
+      resumeElement.style.zIndex = originalZIndex
       throw canvasError
     }
 
   } catch (error) {
-    console.error('Error generating PDF:', error)
-    toast.error(`Failed to generate PDF: ${error.message}`, { id: 'pdf-generation' })
-    throw error
+    console.error('Error generating PDF with primary method:', error)
+    
+    // Try fallback method if primary method fails
+    try {
+      toast('Trying alternative PDF generation method...', { 
+        id: 'pdf-generation',
+        icon: '⚠️'
+      })
+      
+      return await generatePDFFallback(resumeData, password)
+    } catch (fallbackError) {
+      console.error('Both PDF generation methods failed:', fallbackError)
+      toast.error(`Failed to generate PDF: ${fallbackError.message}`, { id: 'pdf-generation' })
+      throw fallbackError
+    }
   }
 }
 
