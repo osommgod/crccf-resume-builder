@@ -4,8 +4,8 @@ import { generateSimplePDF, generatePassword } from '../../utils/simplePDF'
 import PasswordModal from '../shared/PasswordModal'
 import EmailModal from '../shared/EmailModal'
 import WhatsAppModal from '../shared/WhatsAppModal'
+import RequiredFieldsSummary from './RequiredFieldsSummary'
 import toast from 'react-hot-toast'
-import '../../styles/print.css'
 
 /**
  * PDF Download, Email, Print buttons + validation
@@ -30,7 +30,19 @@ const FormActions = ({
     // Validate form first
     const validation = onValidate ? onValidate() : validateResume()
     if (!validation.isValid) {
-      toast.error('Please complete all required fields before generating PDF')
+      // Show detailed error messages
+      const errorMessages = validation.errors.slice(0, 3) // Show first 3 errors
+      const errorMessage = errorMessages.length > 1 
+        ? `Please complete these required fields:\n• ${errorMessages.join('\n• ')}`
+        : `Please complete this required field: ${errorMessages[0]}`
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        style: {
+          maxWidth: '500px',
+          whiteSpace: 'pre-line'
+        }
+      })
       return
     }
 
@@ -56,28 +68,23 @@ const FormActions = ({
     // Validate form first
     const validation = onValidate ? onValidate() : validateResume()
     if (!validation.isValid) {
-      toast.error('Please complete all required fields before sending email')
+      // Show detailed error messages
+      const errorMessages = validation.errors.slice(0, 3) // Show first 3 errors
+      const errorMessage = errorMessages.length > 1 
+        ? `Please complete these required fields before sending email:\n• ${errorMessages.join('\n• ')}`
+        : `Please complete this required field before sending email: ${errorMessages[0]}`
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        style: {
+          maxWidth: '500px',
+          whiteSpace: 'pre-line'
+        }
+      })
       return
     }
 
-    // Generate PDF if not already generated
-    if (!generatedPDF) {
-      setIsGenerating(true)
-      try {
-        // Use client-side PDF generation with encryption
-        const result = await generateProtectedPDFClient(resumeData, 'resume-preview', false)
-        setGeneratedPDF(result)
-        setShowEmailModal(true)
-        toast.success('PDF generated successfully!')
-      } catch (error) {
-        console.error('Error generating PDF:', error)
-        toast.error('Failed to generate PDF. Please try again.')
-      } finally {
-        setIsGenerating(false)
-      }
-    } else {
-      setShowEmailModal(true)
-    }
+    setShowEmailModal(true)
   }
 
   // Handle print - improved version with print-only CSS
@@ -85,7 +92,19 @@ const FormActions = ({
     // Validate form first
     const validation = onValidate ? onValidate() : validateResume()
     if (!validation.isValid) {
-      toast.error('Please complete all required fields before printing')
+      // Show detailed error messages
+      const errorMessages = validation.errors.slice(0, 3) // Show first 3 errors
+      const errorMessage = errorMessages.length > 1 
+        ? `Please complete these required fields before printing:\n• ${errorMessages.join('\n• ')}`
+        : `Please complete this required field before printing: ${errorMessages[0]}`
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        style: {
+          maxWidth: '500px',
+          whiteSpace: 'pre-line'
+        }
+      })
       return
     }
 
@@ -108,26 +127,23 @@ const FormActions = ({
     // Validate form first
     const validation = onValidate ? onValidate() : validateResume()
     if (!validation.isValid) {
-      toast.error('Please complete all required fields before sharing')
+      // Show detailed error messages
+      const errorMessages = validation.errors.slice(0, 3) // Show first 3 errors
+      const errorMessage = errorMessages.length > 1 
+        ? `Please complete these required fields before sharing:\n• ${errorMessages.join('\n• ')}`
+        : `Please complete this required field before sharing: ${errorMessages[0]}`
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        style: {
+          maxWidth: '500px',
+          whiteSpace: 'pre-line'
+        }
+      })
       return
     }
 
-    // Generate PDF if not already generated
-    if (!generatedPDF) {
-      setIsGenerating(true)
-      try {
-        const result = await generateProtectedPDF(resumeData, 'resume-preview')
-        setGeneratedPDF(result)
-        setShowWhatsAppModal(true)
-      } catch (error) {
-        console.error('Error generating PDF:', error)
-        toast.error('Failed to generate PDF. Please try again.')
-      } finally {
-        setIsGenerating(false)
-      }
-    } else {
-      setShowWhatsAppModal(true)
-    }
+    setShowWhatsAppModal(true)
   }
 
   // Handle reset form
@@ -251,6 +267,9 @@ const FormActions = ({
           </div>
         </div>
 
+        {/* Required Fields Summary */}
+        <RequiredFieldsSummary />
+
         {/* Progress indicator */}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
@@ -269,7 +288,7 @@ const FormActions = ({
           </div>
           {completionPercentage < 75 && (
             <p className="mt-1 text-xs text-gray-500">
-              Complete at least 75% of the form to enable PDF download and email features
+              Complete all required fields to enable PDF download, email, and print features
             </p>
           )}
         </div>
@@ -293,7 +312,6 @@ const FormActions = ({
         isOpen={showEmailModal}
         onClose={handleEmailModalClose}
         resumeData={resumeData}
-        resumeBase64={generatedPDF?.pdfBase64}
         password={getPassword()}
         onEmailSent={(email) => {
           handleEmailModalClose()

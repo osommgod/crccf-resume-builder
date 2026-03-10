@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { validateEmail } from '../../utils/validators'
 import axiosInstance from '../../utils/axiosInstance'
+import toast from 'react-hot-toast'
 
 const EmailModal = ({ 
   isOpen, 
   onClose, 
   resumeData, 
-  resumeBase64, 
   password,
   onEmailSent = null 
 }) => {
@@ -46,9 +46,29 @@ const EmailModal = ({
     setEmailError('')
 
     try {
-      const response = await axiosInstance.post('/email/send-email', {
+      // Generate PDF for email
+      toast.loading('Generating PDF for email...', { id: 'email-pdf' })
+      
+      const { generatePDFForEmail } = await import('../../utils/simplePDF')
+      const { blob, password: generatedPassword } = await generatePDFForEmail(resumeData)
+      
+      // Convert blob to base64 for email
+      const pdfBase64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          const base64String = reader.result.split(',')[1]
+          resolve(base64String)
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(blob)
+      })
+
+      toast.success('PDF generated successfully', { id: 'email-pdf' })
+
+      // Send email via backend
+      const response = await axiosInstance.post('/api/email/send-email', {
         resumeBase64,
-        password,
+        password: generatedPassword,
         recipientEmail: email.trim(),
         userName: resumeData.personalInfo.fullName
       })
@@ -61,6 +81,7 @@ const EmailModal = ({
     } catch (error) {
       console.error('Error sending email:', error)
       setEmailError('Failed to send email. Please try again.')
+      toast.error('Failed to send email', { id: 'email-pdf' })
     } finally {
       setIsSending(false)
     }

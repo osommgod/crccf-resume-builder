@@ -60,6 +60,45 @@ export const generateSimplePDF = async (resumeData) => {
   }
 }
 
+/**
+ * Generate PDF for email (returns blob instead of downloading)
+ */
+export const generatePDFForEmail = async (resumeData) => {
+  try {
+    console.log('🟢 Generating PDF for email')
+    
+    // Generate password
+    const firstName = resumeData.personalInfo?.fullName?.split(' ')[0] || 'User'
+    const dob = resumeData.personalInfo?.dateOfBirth || new Date().toISOString().split('T')[0]
+    const date = new Date(dob)
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    const password = `${firstName}-${day}${month}${year}`
+    
+    // Call simple PDF endpoint
+    const response = await axiosInstance.post('/api/simple-pdf/generate-simple-pdf', {
+      resumeData,
+      password
+    }, {
+      responseType: 'blob' // Important: Get PDF as blob
+    })
+    
+    // Create blob and return
+    const blob = new Blob([response.data], { type: 'application/pdf' })
+    
+    return {
+      blob,
+      password,
+      fileName: `${resumeData.personalInfo?.fullName?.replace(/\s+/g, '_') || 'Resume'}_Protected.pdf`
+    }
+    
+  } catch (error) {
+    console.error('❌ Error generating PDF for email:', error)
+    throw error
+  }
+}
+
 export const generatePassword = (fullName, dateOfBirth) => {
   const firstName = fullName?.split(' ')[0] || 'User'
   

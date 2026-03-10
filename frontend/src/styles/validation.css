@@ -1,0 +1,102 @@
+/* Required field indicators */
+.required-field {
+  position: relative;
+}
+
+.required-field::after {
+  content: " *";
+  color: #ef4444;
+  font-weight: bold;
+  margin-left: 2px;
+}
+
+.required-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.required-label::after {
+  content: " *";
+  color: #ef4444;
+  font-weight: bold;
+  margin-left: 2px;
+}
+
+/* Validation error styling */
+.validation-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
+}
+
+.validation-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.validation-message::before {
+  content: "⚠";
+  margin-right: 0.25rem;
+}
+
+/* Form section indicators */
+.form-section-required {
+  border-left: 4px solid #ef4444;
+  padding-left: 1rem;
+}
+
+.form-section-complete {
+  border-left: 4px solid #10b981;
+  padding-left: 1rem;
+}
+
+.form-section-partial {
+  border-left: 4px solid #f59e0b;
+  padding-left: 1rem;
+}
+
+/* Progress indicator for required fields */
+.required-fields-progress {
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.required-fields-progress h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.required-fields-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+}
+
+.required-field-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.required-field-item.completed {
+  color: #10b981;
+}
+
+.required-field-item.completed::before {
+  content: "✓";
+  margin-right: 0.25rem;
+  color: #10b981;
+}
+
+.required-field-item.pending::before {
+  content: "○";
+  margin-right: 0.25rem;
+  color: #ef4444;
+}

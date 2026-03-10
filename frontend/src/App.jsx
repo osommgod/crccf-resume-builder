@@ -5,6 +5,8 @@ import AdminPage from './pages/AdminPage'
 import { TimeProvider } from './context/TimeContext'
 import { ResumeProvider } from './context/ResumeContext'
 import './styles/modal.css'
+import './styles/print.css'
+import './styles/validation.css'
 
 /**
  * Main App component for CRCCF Resume Builder
