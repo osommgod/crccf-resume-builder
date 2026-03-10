@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: crccf-resume-builder-backend
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TIME_LIMIT_MINUTES
+        value: 20
+      - key: CORS_ORIGIN
+        value: https://your-app-name.vercel.app
+    healthCheckPath: /health
+    autoDeploy: true
+    
+databases:
+  - name: crccf-resume-db
+    plan: free

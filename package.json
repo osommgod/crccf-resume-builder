@@ -1,7 +1,7 @@
 {
   "name": "crccf-resume-builder",
   "version": "1.0.0",
-  "description": "CRCCF Resume Builder - Full Stack Application with Vercel Deployment",
+  "description": "CRCCF Resume Builder - Full Stack Application with Separate Deployments",
   "private": true,
   "scripts": {
     "start": "cd backend && npm start",
@@ -14,7 +14,9 @@
     "test": "cd backend && npm test",
     "lint": "cd backend && npm run lint",
     "lint:fix": "cd backend && npm run lint:fix",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "deploy:frontend": "cd frontend && vercel --prod",
+    "deploy:backend": "echo 'Deploy backend via Render dashboard'"
   },
   "workspaces": [
     "frontend",
@@ -29,7 +31,8 @@
     "express",
     "mongodb",
     "crccf",
-    "vercel"
+    "vercel",
+    "render"
   ],
   "author": "CRCCF Resume Builder Team",
   "license": "MIT",
